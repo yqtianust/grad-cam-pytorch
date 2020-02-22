@@ -153,53 +153,53 @@ def demo1(image_paths, target_layer, arch, topk, output_dir, cuda):
     4. Run generate() to export results
     """
 
-    # =========================================================================
-    print("Vanilla Backpropagation:")
-
     bp = BackPropagation(model=model)
     probs, ids = bp.forward(images)  # sorted
-
-    for i in range(topk):
-        bp.backward(ids=ids[:, [i]])
-        gradients = bp.generate()
-
-        # Save results as image files
-        for j in range(len(images)):
-            print("\t#{}: {} ({:.5f})".format(j, classes[ids[j, i]], probs[j, i]))
-
-            save_gradient(
-                filename=osp.join(
-                    output_dir,
-                    "{}-{}-vanilla-{}.png".format(j, arch, classes[ids[j, i]]),
-                ),
-                gradient=gradients[j],
-            )
-
-    # Remove all the hook function in the "model"
-    bp.remove_hook()
+    # =========================================================================
+    # print("Vanilla Backpropagation:")
+    #
+    #
+    # for i in range(topk):
+    #     bp.backward(ids=ids[:, [i]])
+    #     gradients = bp.generate()
+    #
+    #     # Save results as image files
+    #     for j in range(len(images)):
+    #         print("\t#{}: {} ({:.5f})".format(j, classes[ids[j, i]], probs[j, i]))
+    #
+    #         save_gradient(
+    #             filename=osp.join(
+    #                 output_dir,
+    #                 "{}-{}-vanilla-{}.png".format(j, arch, classes[ids[j, i]]),
+    #             ),
+    #             gradient=gradients[j],
+    #         )
+    #
+    # # Remove all the hook function in the "model"
+    # bp.remove_hook()
 
     # =========================================================================
-    print("Deconvolution:")
-
-    deconv = Deconvnet(model=model)
-    _ = deconv.forward(images)
-
-    for i in range(topk):
-        deconv.backward(ids=ids[:, [i]])
-        gradients = deconv.generate()
-
-        for j in range(len(images)):
-            print("\t#{}: {} ({:.5f})".format(j, classes[ids[j, i]], probs[j, i]))
-
-            save_gradient(
-                filename=osp.join(
-                    output_dir,
-                    "{}-{}-deconvnet-{}.png".format(j, arch, classes[ids[j, i]]),
-                ),
-                gradient=gradients[j],
-            )
-
-    deconv.remove_hook()
+    # print("Deconvolution:")
+    #
+    # deconv = Deconvnet(model=model)
+    # _ = deconv.forward(images)
+    #
+    # for i in range(topk):
+    #     deconv.backward(ids=ids[:, [i]])
+    #     gradients = deconv.generate()
+    #
+    #     for j in range(len(images)):
+    #         print("\t#{}: {} ({:.5f})".format(j, classes[ids[j, i]], probs[j, i]))
+    #
+    #         save_gradient(
+    #             filename=osp.join(
+    #                 output_dir,
+    #                 "{}-{}-deconvnet-{}.png".format(j, arch, classes[ids[j, i]]),
+    #             ),
+    #             gradient=gradients[j],
+    #         )
+    #
+    # deconv.remove_hook()
 
     # =========================================================================
     print("Grad-CAM/Guided Backpropagation/Guided Grad-CAM:")
@@ -207,13 +207,13 @@ def demo1(image_paths, target_layer, arch, topk, output_dir, cuda):
     gcam = GradCAM(model=model)
     _ = gcam.forward(images)
 
-    gbp = GuidedBackPropagation(model=model)
-    _ = gbp.forward(images)
+    # gbp = GuidedBackPropagation(model=model)
+    # _ = gbp.forward(images)
 
     for i in range(topk):
         # Guided Backpropagation
-        gbp.backward(ids=ids[:, [i]])
-        gradients = gbp.generate()
+        # gbp.backward(ids=ids[:, [i]])
+        # gradients = gbp.generate()
 
         # Grad-CAM
         gcam.backward(ids=ids[:, [i]])
@@ -223,13 +223,13 @@ def demo1(image_paths, target_layer, arch, topk, output_dir, cuda):
             print("\t#{}: {} ({:.5f})".format(j, classes[ids[j, i]], probs[j, i]))
 
             # Guided Backpropagation
-            save_gradient(
-                filename=osp.join(
-                    output_dir,
-                    "{}-{}-guided-{}.png".format(j, arch, classes[ids[j, i]]),
-                ),
-                gradient=gradients[j],
-            )
+            # save_gradient(
+            #     filename=osp.join(
+            #         output_dir,
+            #         "{}-{}-guided-{}.png".format(j, arch, classes[ids[j, i]]),
+            #     ),
+            #     gradient=gradients[j],
+            # )
 
             # Grad-CAM
             save_gradcam(
@@ -244,15 +244,15 @@ def demo1(image_paths, target_layer, arch, topk, output_dir, cuda):
             )
 
             # Guided Grad-CAM
-            save_gradient(
-                filename=osp.join(
-                    output_dir,
-                    "{}-{}-guided_gradcam-{}-{}.png".format(
-                        j, arch, target_layer, classes[ids[j, i]]
-                    ),
-                ),
-                gradient=torch.mul(regions, gradients)[j],
-            )
+            # save_gradient(
+            #     filename=osp.join(
+            #         output_dir,
+            #         "{}-{}-guided_gradcam-{}-{}.png".format(
+            #             j, arch, target_layer, classes[ids[j, i]]
+            #         ),
+            #     ),
+            #     gradient=torch.mul(regions, gradients)[j],
+            # )
 
 
 @main.command()
